@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-load_dotenv(dotenv_path=r"D:\ValeriaV1-TTS-STT-SSS\.env", override=True)
+load_dotenv(override=True)
 
 import discord
 from discord.ext import commands
