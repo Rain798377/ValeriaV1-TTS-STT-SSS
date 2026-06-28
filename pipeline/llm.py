@@ -2,9 +2,9 @@
 LLM — Language Model via llama.cpp OpenAI-compatible server
 
 Start your server with:
-  llama-server -m your_model.gguf --host 127.0.0.1 --port 8080 -ngl 20 -c 4096
+  llama-server -m Dolphin3.0-Llama3.2-3B-Q4_K_M.gguf --host 127.0.0.1 --port 8080 -ngl 99 -c 4096
 
-  -ngl 20   = offload 20 layers to your 4GB GPU (adjust to fit)
+  -ngl 99   = offload all layers — the 3B model fits fully on a 4GB GPU
   -c 4096   = context window
 
 Input:  conversation history (list of {role, content} dicts)

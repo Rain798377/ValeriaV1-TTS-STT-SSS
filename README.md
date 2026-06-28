@@ -41,24 +41,25 @@ winget install ffmpeg
 
 ### 3. Set up llama.cpp server
 
-Download a GGUF model — recommended for your hardware (5–6GB RAM):
+Download a GGUF model — recommended for your hardware (~2GB):
 
-- [`dolphin-llama3-8B-Q4_K_M.gguf`](https://huggingface.co/bartowski/dolphin-llama3-8B-GGUF)
-- [`Hermes-3-Llama-3.1-8B-Q4_K_M.gguf`](https://huggingface.co/bartowski/Hermes-3-Llama-3.1-8B-GGUF)
+- [`Dolphin3.0-Llama3.2-3B-Q4_K_M.gguf`](https://huggingface.co/bartowski/Dolphin3.0-Llama3.2-3B-GGUF)
 
 Start the server:
 
 ```bash
 llama-server \
-  -m path/to/your_model.gguf \
+  -m path/to/Dolphin3.0-Llama3.2-3B-Q4_K_M.gguf \
   --host 127.0.0.1 \
   --port 8080 \
-  -ngl 20 \
+  -ngl 99 \
   -c 4096 \
   --chat-template chatml
 ```
 
-> **`-ngl 20`** — offloads 20 layers to your GPU. Adjust this number up/down based on how much VRAM you want to use. Start at 20, go higher if your GPU has headroom.
+> **`-ngl 99`** — at this size (~2GB), the whole model fits comfortably on a 4GB GPU, so just offload everything (any number ≥ the model's actual layer count works; llama.cpp clamps it). No need to tune this down unless you're running something else on the GPU at the same time.
+
+> **Note:** Dolphin models respond best when they know they're uncensored. If you want it to drop refusals entirely, set `SYSTEM_PROMPT` in your `.env` to explicitly state it's an unrestricted assistant — just telling it to "be helpful" isn't enough, Dolphin won't associate that with permissiveness on its own.
 
 ### 4. Set up Kokoro TTS (recommended)
 
@@ -105,7 +106,11 @@ KOKORO_VOICE=af_heart
 2. New Application → Bot
 3. Enable **Message Content Intent** and **Server Members Intent**
 4. Copy the token into `.env`
-5. Invite the bot with scopes: `bot` + permissions: `Send Messages`, `Connect`, `Speak`, `Use Voice Activity`
+5. Invite the bot with scopes: `bot` + `applications.commands`, and permissions: `Send Messages`, `Connect`, `Speak`, `Use Voice Activity`
+
+> **`applications.commands` scope is required** for `/listen` and `/unlisten` to show up — if you already invited the bot without it, re-invite using the same client ID with the scope added; it'll just update permissions on the existing install, no need to kick it first.
+>
+> Slash commands sync globally on startup by default, which can take up to an hour to propagate the first time. If you want to test instantly while developing, you can scope a command to your server only by passing `guild_ids=[YOUR_GUILD_ID]` to the `@discord.slash_command(...)` decorator in `cogs/chat.py`.
 
 ---
 
@@ -113,7 +118,7 @@ KOKORO_VOICE=af_heart
 
 ```bash
 # Terminal 1 — start LLM server first
-llama-server -m your_model.gguf --port 8080 -ngl 20 -c 4096
+llama-server -m Dolphin3.0-Llama3.2-3B-Q4_K_M.gguf --port 8080 -ngl 99 -c 4096
 
 # Terminal 2 — start bot
 python bot.py
@@ -127,7 +132,11 @@ python bot.py
 |---------|-------------|
 | `!join` / `!j` | Join your voice channel and start listening |
 | `!leave` / `!l` / `!bye` | Leave the voice channel |
-| `!reset` / `!r` | Clear conversation history |
+| `!reset` / `!r` | Clear voice conversation history |
+| `/listen [channel]` | Start text-to-text chat in one channel (defaults to the channel you run it in) — no voice involved, just plain messages in → LLM reply out |
+| `/unlisten` | Stop text-to-text chat for this server |
+
+Voice (`!` commands) and text (`/listen`) keep **separate** conversation histories — talking to it in voice doesn't carry context into the text channel, and vice versa.
 
 ---
 
@@ -135,14 +144,14 @@ python bot.py
 
 ### GPU layer offloading (`-ngl`)
 
-With 4GB VRAM and an 8B Q4 model, you can typically offload 20–28 layers to GPU. The rest runs on CPU/RAM. Experiment:
+With 4GB VRAM and a 3B Q4 model (~2GB), the whole model fits on GPU — set `-ngl 99` and don't worry about it. This is different from an 8B model, where you'd have to partially offload layers and split the rest to CPU/RAM. If you ever swap to a bigger model later and start hitting VRAM limits, that's when you'd dial this down:
 
 ```bash
-# Start conservative
-llama-server -m model.gguf -ngl 15
+# Full offload (recommended for 3B at this VRAM size)
+llama-server -m model.gguf -ngl 99
 
-# Watch VRAM usage with nvidia-smi, increase until it fills up
-llama-server -m model.gguf -ngl 28
+# If you upgrade to a bigger model and run out of VRAM, scale back
+llama-server -m model.gguf -ngl 20
 ```
 
 ### Silence detection

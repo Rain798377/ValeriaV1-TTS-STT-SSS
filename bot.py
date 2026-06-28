@@ -25,8 +25,10 @@ async def on_command_error(ctx, error):
         return
     await ctx.send(f"❌ Error: {error}")
 
-# Load cog synchronously for py-cord
+# Load cogs synchronously for py-cord
 from cogs.voice import VoiceCog
+from cogs.chat import ChatCog
 bot.add_cog(VoiceCog(bot))
+bot.add_cog(ChatCog(bot))
 
 bot.run(Config.DISCORD_TOKEN)
