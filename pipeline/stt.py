@@ -22,7 +22,7 @@ def _load_whisper():
         from pywhispercpp.model import Model
         print(f"[STT] Loading Whisper model: {Config.WHISPER_MODEL}")
         _whisper_model = Model(Config.WHISPER_MODEL, print_realtime=False, print_progress=False)
-        print("[STT] Whisper model loaded ✅")
+        print("[STT] Whisper model loaded")
         return _whisper_model
     except ImportError:
         raise RuntimeError("pywhispercpp not installed. Run: pip install pywhispercpp")

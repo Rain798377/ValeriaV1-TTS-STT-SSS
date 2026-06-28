@@ -29,7 +29,7 @@ def _load_kokoro():
         from kokoro_onnx import Kokoro
         print("[TTS] Loading Kokoro model...")
         _kokoro_model = Kokoro("kokoro-v1.0.onnx", "voices-v1.0.bin")
-        print("[TTS] Kokoro loaded ✅")
+        print("[TTS] Kokoro loaded")
         return _kokoro_model
     except ImportError:
         raise RuntimeError(
