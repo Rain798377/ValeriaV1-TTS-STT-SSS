@@ -14,7 +14,7 @@ class Config:
 
     # ── LLM (llama.cpp server) ─────────────────────────────────────────────────
     # Run: llama-server -m Dolphin3.0-Llama3.2-3B-Q4_K_M.gguf --host 127.0.0.1 --port 8080 -ngl 99
-    LLAMA_API_URL   = os.getenv("LLAMA_API_URL", "http://127.0.0.1:8080")
+    LLAMA_API_URL   = os.getenv("LLAMA_API_URL", "http://192.9.148.110:8080")
     LLM_MAX_TOKENS  = int(os.getenv("LLM_MAX_TOKENS", "512"))
     LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.8"))
     SYSTEM_PROMPT   = os.getenv(

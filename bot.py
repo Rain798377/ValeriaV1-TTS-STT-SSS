@@ -14,16 +14,16 @@ bot = commands.Bot(command_prefix=Config.PREFIX, intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f"✅ Logged in as {bot.user} ({bot.user.id})")
-    print(f"🎙️  STT: {Config.WHISPER_MODEL}")
-    print(f"🧠  LLM: {Config.LLAMA_API_URL}")
-    print(f"🔊  TTS: {Config.TTS_ENGINE}")
+    print(f"Logged in as {bot.user} ({bot.user.id})")
+    print(f"STT: {Config.WHISPER_MODEL}")
+    print(f"LLM: {Config.LLAMA_API_URL}")
+    print(f"TTS: {Config.TTS_ENGINE}")
 
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return
-    await ctx.send(f"❌ Error: {error}")
+    await ctx.send(f"Error: {error}")
 
 # Load cogs synchronously for py-cord
 from cogs.voice import VoiceCog
